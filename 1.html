@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECHOSAKS DIARY</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f8ff;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            backdrop-filter: blur(10px);
+        }
+        header {
+            background-color: rgba(5, 111, 160, 0.8); /* 主题色 */
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            position: relative;
+            backdrop-filter: blur(10px);
+        }
+        nav {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .container {
+            padding: 20px;
+        }
+        .section-title {
+            font-size: 24px;
+            margin-bottom: 10px;
+            position: relative;
+        }
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background-color: rgba(5, 111, 160, 0.8); /* 主题色 */
+        }
+        .entry {
+            border-bottom: 1px solid #ccc;
+            padding: 10px 0;
+            backdrop-filter: blur(10px);
+            position: relative;
+        }
+        .entry time {
+            font-size: 0.8em;
+            color: #666;
+            display: block;
+        }
+        .triangle {
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-bottom: 10px solid rgba(5, 111, 160, 0.8); /* 主题色 */
+            margin: 10px auto;
+            cursor: pointer;
+        }
+        .delete-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: rgba(255, 0, 0, 0.8);
+            color: white;
+            border: none;
+            padding: 5px;
+            cursor: pointer;
+        }
+        footer {
+            background-color: rgba(5, 111, 160, 0.8); /* 主题色 */
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            backdrop-filter: blur(10px);
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        textarea {
+            width: 100%;
+            height: 60px;
+        }
+        input[type="submit"] {
+            background-color: rgba(5, 111, 160, 0.8); /* 主题色 */
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>ECHOSAKS DIARY</h1>
+        <nav>
+            <a href="#diary">日记</a>
+            <a href="#lists">清单</a>
+        </nav>
+    </header>
+    <div class="container">
+        <section id="diary">
+            <h2 class="section-title">日记</h2>
+            <form id="diaryForm">
+                <textarea id="diaryInput" placeholder="写下你的日记..."></textarea>
+                <input type="submit" value="添加日记">
+            </form>
+            <div id="diaryEntries">
+                <!-- 动态添加的日记内容会显示在这里 -->
+            </div>
+        </section>
+        <section id="lists">
+            <h2 class="section-title">清单</h2>
+            <form id="listForm">
+                <textarea id="listInput" placeholder="列出你的清单..."></textarea>
+                <input type="submit" value="添加清单">
+            </form>
+            <div id="listEntries">
+                <!-- 动态添加的清单内容会显示在这里 -->
+            </div>
+        </section>
+    </div>
+    <footer>
+        <p>&copy; 2024 ECHOSAKS DIARY</p>
+    </footer>
+    <script>
+        function createEntry(content, containerId) {
+            const entryDiv = document.createElement('div');
+            const timestamp = new Date().toLocaleString();
+            entryDiv.className = 'entry';
+            entryDiv.innerHTML = '<time>' + timestamp + '</time><p>' + content + '</p><div class="triangle" onclick="toggleEntry(this)"></div><button class="delete-button" onclick="deleteEntry(this)">删除</button>';
+            document.getElementById(containerId).appendChild(entryDiv);
+        }
+
+        document.getElementById('diaryForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const entryText = document.getElementById('diaryInput').value;
+            if (entryText.trim() !== '') {
+                createEntry(entryText, 'diaryEntries');
+                saveEntries('diaryEntries');
+                document.getElementById('diaryInput').value = '';
+            }
+        });
+
+        document.getElementById('listForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const entryText = document.getElementById('listInput').value;
+            if (entryText.trim() !== '') {
+                createEntry(entryText, 'listEntries');
+                saveEntries('listEntries');
+                document.getElementById('listInput').value = '';
+            }
+        });
+
+        function toggleEntry(element) {
+            const content = element.previousElementSibling;
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+            } else {
+                content.style.display = 'none';
+            }
+        }
+
+        function deleteEntry(element) {
+            const container = element.parentElement.parentElement.id;
+            element.parentElement.remove();
+            saveEntries(container);
+        }
+
+        function saveEntries(containerId) {
+            const entries = document.getElementById(containerId).innerHTML;
+            localStorage.setItem(containerId, entries);
+        }
+
+        function loadEntries() {
+            const diaryEntries = localStorage.getItem('diaryEntries');
+            if (diaryEntries) {
+                document.getElementById('diaryEntries').innerHTML = diaryEntries;
+            }
+            const listEntries = localStorage.getItem('listEntries');
+            if (listEntries) {
+                document.getElementById('listEntries').innerHTML = listEntries;
+            }
+        }
+
+        window.onload = loadEntries;
+    </script>
+</body>
+</html>
